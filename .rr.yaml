@@ -1,0 +1,41 @@
+version: '2.7'
+rpc:
+    listen: 'tcp://127.0.0.1:6001'
+
+server:
+    command: 'php app.php'
+    relay: pipes
+
+amqp:
+  addr: amqp://guest:guest@127.0.0.1:5672
+
+logs:
+  level: info
+  mode: production
+
+jobs:
+  consume: ['amqp']
+  pool:
+    num_workers: 16
+
+  pipelines:
+    amqp:
+      driver: amqp
+      config:
+        prefetch: 1000
+#    kafka:
+#      driver: kafka
+#      config:
+#        topic: queue
+#        brokers: [ 127.0.0.1:9092 ]
+#        prefetch: 1000
+
+    memory:
+      driver: memory
+      config:
+        prefetch: 1000
+        max_jobs: 1_000_000
+
+
+metrics:
+  address: 127.0.0.1:2112
